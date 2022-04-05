@@ -1,19 +1,18 @@
 import React, {useState} from "react"
-import { StyleSheet, View, Text} from 'react-native'
+import { StyleSheet, View, Text, Image} from 'react-native'
 import { Input, Icon, Button } from 'react-native-elements'
 import { validateEmail } from '../../utils/validation'
 import firebase from "firebase"
 import {useNavigation} from '@react-navigation/native'
-
+import Loading from "../Loading"
 export default function LoginForm(props){
     const {toastRef} = props
     const[showPassword, setShowPassword] = useState(false)
-    const[showRepeatPassword, setShowRepeatPassword] = useState(false)
     const [formData, setFormData] = useState(defaultFormValues())
     const navigation = useNavigation()
 
     const onSubmit = () => {
-        if(formData.email.length===0||formData.password.length===0||formData.repeatPassword.length===0){
+        if(formData.email.length===0||formData.password.length===0){
             toastRef.current.show({
                 type: 'error',
                 position: 'top',
@@ -29,14 +28,6 @@ export default function LoginForm(props){
                 text2: 'El email no es correcto',
                 visibilityTime: 3000
             })
-        } else if(formData.password !== formData.repeatPassword){
-            toastRef.current.show({
-                type: 'error',
-                position: 'top',
-                text1: 'Password',
-                text2: 'Las contraseñas deben ser identicas',
-                visibilityTime: 3000
-            })
         } else if(formData.password.length < 6){
             toastRef.current.show({
                 type: 'error',
@@ -47,20 +38,21 @@ export default function LoginForm(props){
             })
         }else{
             firebase
-            .auth().
-            createUserWithEmailAndPassword(formData.email, formData.password)
-            .then((response)=>{
+            .auth()
+            .signInWithEmailAndPassword(formData.email, formData.password)
+            .then(()=>{
+                <Loading isVisible = {true} text = 'Cargando...'/>
                 navigation.navigate('account')
             })
-            .catch(()=>[
+            .catch(()=>{
                 toastRef.current.show({
                     type: 'error',
                     position: 'top',
                     text1: 'Cuenta',
-                    text2: 'Este correo ya ha sido registrado',
+                    text2: 'Las credenciales no son correctas',
                     visibilityTime: 3000
                 })
-            ])
+            })
         }
     }
 
@@ -70,7 +62,7 @@ export default function LoginForm(props){
 
     
     return(
-        <View style={styles.formContainer}>
+        <View style={styles.formContainer}>            
             <Input
                 placeholder="Correo electronico"
                 containerStyle={styles.inputForm}
@@ -90,23 +82,10 @@ export default function LoginForm(props){
                 onPress={()=> setShowPassword(!showPassword)}
                 />}
             />
-            <Input
-                placeholder="Repita la contraseña"
-                containerStyle={styles.inputForm}
-                password={true}
-                secureTextEntry={showRepeatPassword ? false : true}
-                onChange={(e)=>onChange(e, 'repeatPassword')}
-                rightIcon={<Icon 
-                    type='material-community' 
-                    name= {showRepeatPassword ? 'eye-off-outline' : 'eye-outline'}
-                    iconStyle={styles.iconRight}
-                    onPress={()=> setShowRepeatPassword(!showRepeatPassword)}
-                    />}                    
-            />
             <Button
-                title='Unete'
-                containerStyle={styles.btnCointainerRegister}
-                buttonStyle={styles.btnRegister}
+                title='Iniciar Sesión'
+                containerStyle={styles.btnCointainerLogin}
+                buttonStyle={styles.btnLogin}
                 onPress={onSubmit}
             />
         </View>
@@ -130,15 +109,20 @@ const styles = StyleSheet.create({
         width: '100%',
         marginTop: 20
     },
-    btnCointainerRegister:{
+    btnCointainerLogin:{
         marginTop:20,
         width: '95%',
         
     },
-    btnRegister:{
+    btnLogin:{
         backgroundColor: '#00a680'
     },
     iconRight:{
         color: '#c1c1c1'
+    },
+    logo:{
+        width: '100%',
+        height: 150,
+        marginTop: 20
     }
 })
