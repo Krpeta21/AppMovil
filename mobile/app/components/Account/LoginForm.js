@@ -41,7 +41,7 @@ export default function LoginForm(props){
             .auth()
             .signInWithEmailAndPassword(formData.email, formData.password)
             .then(()=>{
-                <Loading isVisible = {true} text = 'Cargando...'/>
+                
                 navigation.navigate('account')
             })
             .catch(()=>{
