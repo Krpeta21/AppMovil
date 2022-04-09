@@ -1,18 +1,19 @@
-import React from "react"
+import React,{useState} from "react"
 import { StyleSheet, View, Text } from "react-native"
 import { Avatar } from "react-native-elements"
 import firebase from 'firebase'
 import * as Permissions from 'expo-permissions'
 import * as ImagePicker from 'expo-image-picker'
+import Loading from "../Loading"
 
 export default function InfoUser(props){
-    const{userInfo, toastRef} = props
+    const{userInfo, toastRef, setReloadUserInfo} = props
     const {uid, photoURL, displayName, email} = userInfo
-
+    const [loading, setIsLoading] = useState(false)
     console.log(photoURL)
     console.log(displayName)
     console.log(email)
-
+    
     const changeAvatar= async ()=>{
         const resultPermissions = await Permissions.askAsync(Permissions.CAMERA_ROLL)
         console.log(resultPermissions.permissions.mediaLibrary)
@@ -25,7 +26,7 @@ export default function InfoUser(props){
                 text2: 'Es necesario aceptar los permisos de la galeria.',
                 visibilityTime: 3000
             })
-        }else{
+        }else{            
             const result = await ImagePicker.launchImageLibraryAsync({
                 allowsEditing:true,
                 aspect:[4,3]
@@ -33,16 +34,18 @@ export default function InfoUser(props){
             console.log(result)
             if(result.cancelled){
                 toastRef.current.show({
-                    type: 'Info',
+                    type: 'info',
                     position: 'top',
                     text1: 'Cancelled',
                     text2: 'No elegiste avatar de la galeria',
                     visibilityTime: 3000
                 })
-            }else{              
+            }else{        
+                setIsLoading(true)      
                 uploadImage(result.uri).then(()=>{
                     console.log('Imagen dentro de firebase')
                     updatePhotoUrl()
+                setIsLoading(false)
                     
                 }).catch(()=>{
                     toastRef.current.show({
@@ -75,8 +78,9 @@ export default function InfoUser(props){
             console.log(response)
             const update = { photoURL: response}
             await firebase.auth().currentUser.updateProfile(update)
-            console.log("imagen actualizada")
-            actualizando()
+            console.log("imagen actualizada")            
+            setReloadUserInfo(true)
+            
         })
         
     }
@@ -101,6 +105,7 @@ export default function InfoUser(props){
                 <Text style={Styles.displayName}>
                     {displayName ? displayName : 'Invitado'}
                 </Text>
+                <Loading isVisible = {loading} text = 'Cargando...'/>
                 <Text>
                     {email ? email : 'Entrada por SSO'}
                 </Text>
