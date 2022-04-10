@@ -1,6 +1,6 @@
 import React,{useState} from "react";
 import { Alert, StyleSheet, View } from "react-native";
-import { Input, Button } from "react-native-elements";
+import { Input, Button, Icon } from "react-native-elements";
 import firebase from "firebase";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 export default function ChangeDisplayPassword(props){
@@ -11,7 +11,9 @@ export default function ChangeDisplayPassword(props){
     const [currentPassword, setCurrentPassword] = useState(null)    
     const [repeatNewDisplayPassword, setRepeatNewDisplayPassword] = useState(null)
     const [isLoading,setIsLoading] = useState(false)
-    
+    const[showPassword, setShowPassword] = useState(false)
+    const[showRepeatPassword, setShowRepeatPassword] = useState(false)
+    const[showCPassword, setShowCPassword] = useState(false)
 const reauthenticate = (currentPassword) => {
         var user = firebase.auth().currentUser
         var cred = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword)
@@ -68,37 +70,42 @@ const onChangePasswordPress = () =>{
                 placeholder="Current Password"
                 
                 containerStyle={styles.input}                
-                rightIcon={{
-                    type:'material-community',
-                    name:'lock',
-                    color: '#c2c2c2'
-                }}
-                errorMessage={errorCurrentPassword}
-                secureTextEntry={true}
+                password={true}
+                secureTextEntry={showCPassword ? false : true}
+                rightIcon={
+                    <Icon type='material-community' 
+                    name= {showCPassword ? 'eye-off-outline' : 'eye-outline'}
+                    iconStyle={styles.iconRight}                    
+                    onPress={()=> setShowCPassword(!showCPassword)}
+                    />}
+                errorMessage={errorCurrentPassword}                
                 onChange={(e)=>setCurrentPassword(e.nativeEvent.text)}
             />
             <Input
                 defaultValue={''}
                 placeholder="Password"
                 containerStyle={styles.input}
-                rightIcon={{
-                    type:'material-community',
-                    name:'lock',
-                    color: '#c2c2c2'
-                }}
-                
-                secureTextEntry={true}
+                password={true}
+                secureTextEntry={showPassword ? false : true}
+                rightIcon={
+                    <Icon type='material-community' 
+                    name= {showPassword ? 'eye-off-outline' : 'eye-outline'}
+                    iconStyle={styles.iconRight}                    
+                    onPress={()=> setShowPassword(!showPassword)}
+                    />}
                 onChange={(e)=>setNewDisplayPassword(e.nativeEvent.text)}
             />
             <Input
                 placeholder="Repeat Password"
                 containerStyle={styles.input}
-                rightIcon={{
-                    type:'material-community',
-                    name:'lock',
-                    color: '#c2c2c2'
-                }}
-                secureTextEntry={true}
+                password={true}
+                secureTextEntry={showRepeatPassword ? false : true}
+                rightIcon={
+                    <Icon type='material-community' 
+                    name= {showRepeatPassword ? 'eye-off-outline' : 'eye-outline'}
+                    iconStyle={styles.iconRight}                    
+                    onPress={()=> setShowRepeatPassword(!showRepeatPassword)}
+                    />}
                 errorMessage={error}
                 onChange={(e)=>setRepeatNewDisplayPassword(e.nativeEvent.text)}
             />
@@ -129,5 +136,8 @@ const styles = StyleSheet.create({
     },
     btn:{
         backgroundColor: '#00a680'
+    },
+    iconRight:{
+        color: '#c2c2c2'
     }
 })
