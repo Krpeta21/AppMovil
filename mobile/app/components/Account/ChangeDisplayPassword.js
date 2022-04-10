@@ -31,6 +31,8 @@ const onChangePasswordPress = () =>{
             setError('El password debe tener al menos 6 caracteres')
         }   else if(newDisplayPassword !== repeatNewDisplayPassword){
             setError('Los password deben coincidir.')
+        }else if(newDisplayPassword === currentPassword){
+            setError('Introduce una contraseña diferente al actual.')
         }
         else{
             setIsLoading(true)    
