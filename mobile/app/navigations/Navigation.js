@@ -8,6 +8,7 @@ import FavoritesStack from "./FavoritesStack";
 import SearchStack from "./SearchStack";
 import TopRestaurantsStack from "./TopRestaurantsStack";
 import AccountStack from "./AccountStacks";
+
 //import Restaurants from "../screens/Restaurants";
 //import Favorites from "../screens/Favorites"
 //import Search from "../screens/Search"
